@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "http://mybatis.org/dtd/mybatis-3-mapper.dtd" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.Dingdanmapper">
+    <resultMap id="order" type="com.entity.Orderform">
+
+        <id column="id" property="id"></id>
+        <result column="userid" property="userid"></result>
+        <result column="shoppingid" property="shoppingid"></result>
+        <result column="number" property="number"></result>
+        <result column="dingdanid" property="dingdanid"></result>
+        <result column="state" property="state"></result>
+        <result column="data" property="data"></result>
+        <result column="diziid" property="diziid"></result>
+        <result column="monery" property="monery"></result>
+        <association property="shop" javaType="com.entity.Shop">
+            <id column="shopId" property="shopId"></id>
+            <result column="shopName" property="shopName"></result>
+            <result column="price" property="price"></result>
+            <result column="typeId" property="typeId"></result>
+            <result column="imgId" property="imgId"></result>
+        </association>
+        <association property="img" javaType="com.entity.Img">
+            <id column="id" property="id"/>
+            <result column="imgId" property="imgId"/>
+            <result column="img" property="img"/>
+        </association>
+    </resultMap>
+    <select id="query" resultMap="order">
+        SELECT o.id,o.userid,o.shoppingid,o.number,o.dingdanid,o.state,i.img,
+        o.`data`,o.diziid,o.monery,s.price,s.shopName
+        FROM orderform o   INNER JOIN shopping s
+        ON o.shoppingid=s.shopId
+        INNER JOIN img i ON s.imgId=i.imgId
+        <where>
+            <if test="state!=null and state!=0">
+                o.state=#{state}
+            </if>
+        </where>
+        order by  o.`data` desc, o.dingdanid desc
+    </select>
+    <update id="update">
+        UPDATE orderform SET state=#{state} WHERE dingdanid=#{dingdanid}
+    </update>
+</mapper>

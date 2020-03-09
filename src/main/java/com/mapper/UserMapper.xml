@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "http://mybatis.org/dtd/mybatis-3-mapper.dtd" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.mapper.UserMapper">
+    <resultMap id="queryUser" type="com.entity.User">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="name" property="name"/>
+        <result column="password" property="password"/>
+        <result column="sex" property="sex"/>
+        <result column="tel" property="tel"/>
+        <result column="email" property="email"/>
+        <result column="createdate" property="createdate"/>
+        <result column="status" property="status"/>
+        <result column="level" property="level"/>
+        <association property="address" javaType="com.entity.Address">
+            <id column="aid" property="id"/>
+            <result column="auserid" property="userid"/>
+            <result column="consignee" property="consignee"/>
+            <result column="site" property="site"/>
+            <result column="addres" property="addres"/>
+        </association>
+        <association property="levels" javaType="com.entity.Level">
+            <id column="lid" property="id"/>
+            <result column="levelname" property="levelname"/>
+        </association>
+    </resultMap>
+<select id="query" resultMap="queryUser">
+    SELECT u.id,username,name,password,sex,u.tel,email,createdate,status,level,a.id aid,a.userid auserid,site,addres,l.id lid,levelname FROM `user` u
+    LEFT JOIN shoppingadress a on u.id=a.userid LEFT JOIN `level` l on l.id=`level`
+</select>
+    <select id="queryByid" resultMap="queryUser">
+    SELECT u.id,username,name,password,sex,u.tel,email,createdate,status,level,a.userid auserid,site,addres,l.id lid,levelname FROM `user` u
+        LEFT JOIN shoppingadress a on u.id=a.userid LEFT JOIN `level` l on l.id=`level` where u.id=#{id}
+</select>
+    <delete id="delUser">
+        delete from `user` where id=#{id}
+    </delete>
+    <delete id="delAddress">
+        delete from shoppingadress where userid=#{aid}
+    </delete>
+    <update id="updateUser">
+            update `user`
+            <set>
+                <trim suffix="" suffixOverrides=",">
+                    <if test="user.username != null and user.username !=''">
+                        username=#{user.username},
+                    </if>
+                    <if test="user.name != null and user.name !=''">
+                        name = #{user.name},
+                    </if>
+                    <if test="user.sex != null and user.sex !=''">
+                        sex=#{user.sex},
+                    </if>
+                    <if test="user.tel != null and user.tel !=''">
+                        tel=#{user.tel},
+                    </if>
+                    <if test="user.email != null and user.email !=''">
+                        email=#{user.email},
+                    </if>
+                    <if test="user.status != null">
+                        status=#{user.status},
+                    </if>
+                </trim>
+            </set>
+            <where>
+                <if test="user.id != null">
+                    id=#{user.id}
+                </if>
+            </where>
+    </update>
+    <update id="updateAddress">
+        update shoppingadress
+        <set>
+                <if test="address.addres != null and address.addres !=''">
+                    addres=#{address.addres}
+                </if>
+        </set>
+        <where>
+            <if test="address.id != null">
+                id=#{address.id}
+            </if>
+        </where>
+    </update>
+    <update id="stop">
+        update `user` set status=0 where id=#{id}
+    </update>
+    <update id="start">
+        update `user` set status=1 where id=#{id}
+    </update>
+</mapper>

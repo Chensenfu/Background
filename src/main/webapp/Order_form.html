@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <style type="text/css">
+        ul,li{
+            list-style: none;
+        }
+    </style>
+    <link href="css/admin.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.bootcss.com/amazeui/2.5.1/css/amazeui.css" rel="stylesheet" type="text/css" />
+    <link href="css/orstyle.css" rel="stylesheet" type="text/css" />
+
+    <script src="js/jquery-1.9.1.min.js" type="text/javascript" ></script>
+
+<!--[if lt IE 9]>
+
+  <![endif]-->
+<title>订单列表</title>
+</head>
+<body>
+<h3> 订单管理 </h3>
+<p><select>
+    <option value="0">--请选择--</option>
+    <option value="1">待支付</option>
+    <option value="2">待发货</option>
+    <option value="3">待收货</option>
+    <option value="4">待评价</option>
+    <option value="5">完成的订单</option>
+</select>  <input type="button" value="查询订单" onclick="query()"/></p>
+
+<div class="am-tabs-bd">
+<div class="am-tab-panel am-fade am-in am-active" id="tab1">
+    <div class="order-top">
+        <div class="th th-item">
+            <td class="td-inner">商品</td>
+        </div>
+        <div class="th th-price">
+            <td class="td-inner">单价</td>
+        </div>
+        <div class="th th-number">
+            <td class="td-inner">数量</td>
+        </div>
+        <div class="th th-operation">
+            <td class="td-inner">商品操作</td>
+        </div>
+        <div class="th th-amount">
+            <td class="td-inner">合计</td>
+        </div>
+        <div class="th th-status">
+            <td class="td-inner">交易状态</td>
+        </div>
+        <div class="th th-change">
+            <td class="td-inner">交易操作</td>
+        </div>
+    </div>
+
+    <div class="order-main">
+        <div class="order-list">
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+</body>
+</html>
+
+<script type="text/javascript">
+	//设置内页框架布局
+$(function() {
+    //订单查询
+    query();
+
+});
+    
+function query() {
+    var  state=$("select").val();
+    $.getJSON("orderform/query",{"state":state},function (data) {
+        var page=eval(data);
+        var stc="";
+        $(data).each(function (index,value) {
+            if (index==0){
+                stc+="<div class=\"order-status5\">"+
+                    "<div class=\"order-title\">" +
+                    "<div class=\"dd-num\">订单编号："+value.dingdanid+"</div>" +
+                    "</div>"+
+                    "<div class=\"order-content\">\n" +
+                    "<div class=\"order-left\">\n"+
+                    "<ul class=\"item-list\">\n" +
+                    "<li class=\"td td-item\">\n" +
+                    "<div class=\"item-info\">\n" +
+                    "<div class=\"item-basic-info\">\n" +
+                    "<a href=\"#\">\n" +
+                    "<p>"+value.shop.shopName+"</p>\n" +
+                    "</a>\n" +
+                    "</div>\n" +
+                    "</div>\n" +
+                    "</li>\n" +
+                    "<li class=\"td td-price\">\n" +
+                    "<div class=\"item-price\">\n" +
+                    value.shop.price +
+                    "</div>\n" +
+                    "</li>\n" +
+                    "<li class=\"td td-number\">\n" +
+                    "<div class=\"item-number\">\n" +
+                    "<span>×</span>" +value.number+
+                    "</div>\n" +
+                    " </li>\n" +
+                    " <li class=\"td td-operation\">\n" +
+                    " <div class=\"item-operation\">\n" +
+                    "</div>\n" +
+                    "</li>\n" +
+                    "</ul>\n"
+            } else if (value.dingdanid==page[index-1].dingdanid){
+                stc+=
+                    "<ul class=\"item-list\">\n" +
+                    "<li class=\"td td-item\">\n" +
+                    "<div class=\"item-info\">\n" +
+                    "<div class=\"item-basic-info\">\n" +
+                    "<a href=\"#\">\n" +
+                    "<p>"+value.shop.shopName+"</p>\n" +
+                    "</a>\n" +
+                    "</div>\n" +
+                    "</div>\n" +
+                    "</li>\n" +
+                    "<li class=\"td td-price\">\n" +
+                    "<div class=\"item-price\">\n" +
+                    value.shop.price +
+                    "</div>\n" +
+                    "</li>\n" +
+                    "<li class=\"td td-number\">\n" +
+                    "<div class=\"item-number\">\n" +
+                    "<span>×</span>" +value.number+
+                    "</div>\n" +
+                    " </li>\n" +
+                    " <li class=\"td td-operation\">\n" +
+                    " <div class=\"item-operation\">\n" +
+                    "</div>\n" +
+                    "</li>\n" +
+                    "</ul>\n"
+            }else {
+                stc+= "</div>\n" +
+                    "<div class=\"order-right\">\n" +
+                    "<li class=\"td td-amount\">\n" +
+                    "<div class=\"item-amount\">\n" +
+                    "合计：" +page[index-1].monery+
+                    "</div>\n" +
+                    "</li>\n" +
+                    "<div class=\"move-right\">\n" +
+                    "<li class=\"td td-status\">\n" +
+                    "<div class=\"item-status\">\n"
+
+                if (page[index-1].state==1){
+                    stc+="<p class=\"Mystatus\">待付款</p>";
+                }else if(page[index-1].state==2){
+                    stc+= "<p class=\"Mystatus\">待发货</p>";
+                }else if(page[index-1].state==3){
+                    stc+= "<p class=\"Mystatus\">待收货</p>";
+                }else if(page[index-1].state==4){
+                    stc+= "<p class=\"Mystatus\">待评价</p>";
+                }else if(page[index-1].state==5){
+                    stc+= "<p class=\"Mystatus\">交易完成</p>";
+                }
+                stc+="</div>\n" +
+                    "</li>\n" +
+                    "<li class=\"td td-change\">\n";
+                if(page[index-1].state==2){
+                    stc+="<div class=\"am-btn am-btn-danger anniu\" onclick='update("+page[index-1].dingdanid+",3)'>\n" +
+                        " 发货</div>\n"
+                }
+                stc+= "</li>\n" +
+                    "</div>\n" +
+                    "</div>\n" +
+                    "</div>"+
+                    "<div class=\"order-status5\">"+
+                    "<div class=\"order-title\">" +
+                    "<div class=\"dd-num\">订单编号："+value.dingdanid+"</div>" +
+                    "</div>"+
+                    "<div class=\"order-content\">\n" +
+                    "<div class=\"order-left\">\n"+
+                    "<ul class=\"item-list\">\n" +
+                    "<li class=\"td td-item\">\n" +
+                    "<div class=\"item-info\">\n" +
+                    "<div class=\"item-basic-info\">\n" +
+                    "<a href=\"#\">\n" +
+                    "<p>"+value.shop.shopName+"</p>\n" +
+                    "</a>\n" +
+                    "</div>\n" +
+                    "</div>\n" +
+                    "</li>\n" +
+                    "<li class=\"td td-price\">\n" +
+                    "<div class=\"item-price\">\n" +
+                    value.shop.price +
+                    "</div>\n" +
+                    "</li>\n" +
+                    "<li class=\"td td-number\">\n" +
+                    "<div class=\"item-number\">\n" +
+                    "<span>×</span>" +value.number+
+                    "</div>\n" +
+                    " </li>\n" +
+                    " <li class=\"td td-operation\">\n" +
+                    " <div class=\"item-operation\">\n" +
+                    "</div>\n" +
+                    "</li>\n" +
+                    "</ul>\n"
+            }
+            if ((index+1)==page.length) {
+                stc += "</div>\n" +
+                    "<div class=\"order-right\">\n" +
+                    "<li class=\"td td-amount\">\n" +
+                    "<div class=\"item-amount\">\n" +
+                    "合计：" +page[index-1].monery+
+                    "</div>\n" +
+                    "</li>\n" +
+                    "<div class=\"move-right\">\n" +
+                    "<li class=\"td td-status\">\n" +
+                    "<div class=\"item-status\">\n"
+
+                if (page[index-1].state==1){
+                    stc+="<p class=\"Mystatus\">待付款</p>";
+                }else if(page[index-1].state===2){
+                    stc+= "<p class=\"Mystatus\">待发货</p>";
+                }else if(page[index-1].state==3){
+                    stc+= "<p class=\"Mystatus\">待收货</p>";
+                }else if(page[index-1].state==4){
+                    stc+= "<p class=\"Mystatus\">待评价</p>";
+                }else if(page[index-1].state==5){
+                    stc+= "<p class=\"Mystatus\">交易完成</p>";
+                }
+                stc+="</div>\n" +
+                    "</li>\n" +
+                    "<li class=\"td td-change\">\n";
+                if(page[index-1].state==2){
+                    stc+="<div class=\"am-btn am-btn-danger anniu\" onclick='update("+value.dingdanid+",3)'>\n" +
+                        " 发货</div>\n"
+                }
+                stc+= "</li>\n" +
+                    "</div>\n" +
+                    "</div>\n" +
+                    "</div>"
+            }
+        })
+        $(".order-list").empty().append(stc);
+
+    })
+}
+    function update(dingdanid,state) {
+    if (confirm("订单发货！") ){
+        $.getJSON("orderform/update",{"dingdanid":dingdanid,"state":state},function (data) {
+            if (data){
+                alert("操作成功！");
+               query();
+            } else {
+                alert("操作失败！请重新操作")
+            }
+        })
+    }
+    }
+//后台传入的 标题列表
+
+</script>
